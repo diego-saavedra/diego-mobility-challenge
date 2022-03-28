@@ -169,7 +169,7 @@
             this.lstHistory.Name = "lstHistory";
             this.lstHistory.Size = new System.Drawing.Size(174, 304);
             this.lstHistory.TabIndex = 0;
-            this.lstHistory.Click += new System.EventHandler(this.lstHistory_Click);
+            this.lstHistory.Click += new System.EventHandler(this.LstHistory_Click);
             // 
             // MainForm
             // 

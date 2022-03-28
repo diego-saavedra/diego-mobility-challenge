@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeatherMaster.Models;
 
@@ -13,6 +14,7 @@ namespace WeatherMaster
     {
         private readonly ICollection<string> _history = new List<string>();
         private AppSettings _settings;
+        private RestClient _client;
 
         public MainForm()
         {
@@ -24,6 +26,7 @@ namespace WeatherMaster
             base.OnLoad(e);
             //Initialise settings
             _settings = Program.Configuration.GetSection("AppSettings").Get<AppSettings>();
+            _client = new RestClient("https://api.openweathermap.org");
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -48,6 +51,32 @@ namespace WeatherMaster
             }
         }
 
+        private async Task<IEnumerable<GeoResult>> GetCitiesFromNameAsync(string name)
+        {
+            var request = new RestRequest("geo/1.0/direct", Method.Get);
+            request.AddQueryParameter("q", name);
+            request.AddQueryParameter("limit", 5);
+            request.AddQueryParameter("appid", _settings.ApiKey);
+
+            //Validate city results
+            var result = await _client.ExecuteAsync<IEnumerable<GeoResult>>(request);
+
+            return result.Data;
+        }
+
+        private async Task<WeatherResult> GetWeatherResultForCityAsync(double latitude, double longitude)
+        {
+            var request = new RestRequest("data/2.5/weather", Method.Get);
+            request.AddQueryParameter("lat", latitude);
+            request.AddQueryParameter("lon", longitude);
+            request.AddQueryParameter("appid", _settings.ApiKey);
+            request.AddQueryParameter("units", "metric");
+
+            var result = await _client.ExecuteAsync<WeatherResult>(request);
+
+            return result.Data;
+        }
+
         private async void BtnGo_Click(object sender, EventArgs e)
         {
             //Validate empty string
@@ -58,16 +87,9 @@ namespace WeatherMaster
             }
 
             //Query for cities based on text
-            var client = new RestClient("https://api.openweathermap.org");
-            var geoRequest = new RestRequest("geo/1.0/direct", Method.Get);
-            geoRequest.AddQueryParameter("q", txtSearch.Text.Trim());
-            geoRequest.AddQueryParameter("limit", 5);
-            geoRequest.AddQueryParameter("appid", _settings.ApiKey);
+            var geoResults = await GetCitiesFromNameAsync(txtSearch.Text.Trim());
 
-            //Validate city results
-            var geoResults = await client.ExecuteAsync<IEnumerable<GeoResult>>(geoRequest);
-
-            if (geoResults.Data == null || !geoResults.Data.Any())
+            if (geoResults == null || !geoResults.Any())
             {
                 MessageBox.Show($"Could not find city named {txtSearch.Text.Trim()}");
                 return;
@@ -75,50 +97,52 @@ namespace WeatherMaster
 
             GeoResult selectedCity;
             //Display selection form if more than 1 city was returned
-            if (geoResults.Data.Count() > 1)
+            if (geoResults.Count() > 1)
             {
-                var selectionForm = new SelectionForm(geoResults.Data);
+                var selectionForm = new SelectionForm(geoResults);
                 selectionForm.ShowDialog();
                 selectedCity = selectionForm.SelectedItem;
             }
             else
             {
-                selectedCity = geoResults.Data.First();
+                selectedCity = geoResults.First();
             }
 
             //Request weather for selected city
-            var weatherRequest = new RestRequest("data/2.5/weather", Method.Get);
-            weatherRequest.AddQueryParameter("lat", selectedCity.Latitude);
-            weatherRequest.AddQueryParameter("lon", selectedCity.Longitude);
-            weatherRequest.AddQueryParameter("appid", _settings.ApiKey);
-            weatherRequest.AddQueryParameter("units", "metric");
+            var weatherResult = await GetWeatherResultForCityAsync(selectedCity.Latitude, selectedCity.Longitude);
 
-            var weatherResults = await client.ExecuteAsync<WeatherResult>(weatherRequest);
-
-            //Validate weather results
-            if (weatherResults.Data == null)
+            if (weatherResult == null)
             {
                 MessageBox.Show($"Could not get weather for {txtSearch.Text.Trim()}");
                 return;
             }
 
             //Only write to history successful requests
-            using StreamWriter file = new("history.txt", append: true);
-            await file.WriteLineAsync(txtSearch.Text.Trim());
-
-            //Add to history listbox
-            lstHistory.Items.Insert(0,txtSearch.Text.Trim());
-            grbHistory.Visible = true;
+            await WriteHistoryAsync(txtSearch.Text.Trim());
 
             //Display results
-            lblLocation.Text = txtSearch.Text.Trim();
-            lblTemperature.Text = weatherResults.Data.Main.Temperature.ToString("N0");
-            lblCurrentWeather.Text = weatherResults.Data.Weather.First().Description.ToUpper();
-            lblFeelsLike.Text = weatherResults.Data.Main.FeelsLike.ToString("N0");
+            DisplayResults(txtSearch.Text.Trim(), weatherResult);
+        }
+
+        private async Task WriteHistoryAsync(string location)
+        {
+            using StreamWriter file = new("history.txt", append: true);
+            await file.WriteLineAsync(location);
+
+            lstHistory.Items.Insert(0, location);
+            grbHistory.Visible = true;
+        }
+
+        private void DisplayResults(string location, WeatherResult result)
+        {
+            lblLocation.Text = location;
+            lblTemperature.Text = result.Main.Temperature.ToString("N0");
+            lblCurrentWeather.Text = result.Weather.First().Description.ToUpper();
+            lblFeelsLike.Text = result.Main.FeelsLike.ToString("N0");
             grbResults.Visible = true;
         }
 
-        private void lstHistory_Click(object sender, EventArgs e)
+        private void LstHistory_Click(object sender, EventArgs e)
         {
             //When clicked copy value from history to textbox
             if (lstHistory.SelectedItem != null)
