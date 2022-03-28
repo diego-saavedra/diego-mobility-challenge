@@ -26,15 +26,15 @@ namespace WeatherMaster
             base.OnLoad(e);
             //Initialise settings
             _settings = Program.Configuration.GetSection("AppSettings").Get<AppSettings>();
-            _client = new RestClient("https://api.openweathermap.org");
+            _client = new RestClient(_settings.WeatherApi);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             //Check if history file exists and load history
-            if (File.Exists("history.txt"))
+            if (File.Exists(_settings.HistoryFileName))
             {
-                foreach (string line in File.ReadLines(@"history.txt"))
+                foreach (string line in File.ReadLines(_settings.HistoryFileName))
                 {
                     _history.Add(line);
                 }
@@ -69,7 +69,7 @@ namespace WeatherMaster
             request.AddQueryParameter("lat", latitude);
             request.AddQueryParameter("lon", longitude);
             request.AddQueryParameter("appid", _settings.ApiKey);
-            request.AddQueryParameter("units", "metric");
+            request.AddQueryParameter("units", _settings.Units);
 
             var result = await _client.ExecuteAsync<WeatherResult>(request);
 
@@ -125,9 +125,11 @@ namespace WeatherMaster
 
         private async Task WriteHistoryAsync(string location)
         {
-            using StreamWriter file = new("history.txt", append: true);
+            //Write to history file
+            using StreamWriter file = new(_settings.HistoryFileName, append: true);
             await file.WriteLineAsync(location);
 
+            //Add item to the top of the list
             lstHistory.Items.Insert(0, location);
             grbHistory.Visible = true;
         }
