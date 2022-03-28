@@ -22,11 +22,13 @@ namespace WeatherMaster
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            //Initialise settings
             _settings = Program.Configuration.GetSection("AppSettings").Get<AppSettings>();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //Check if history file exists and load history
             if (File.Exists("history.txt"))
             {
                 foreach (string line in File.ReadLines(@"history.txt"))
@@ -35,6 +37,7 @@ namespace WeatherMaster
                 }
             }
 
+            //Populate history list
             if (_history.Any())
             {
                 foreach (var line in _history.Reverse())
@@ -47,18 +50,21 @@ namespace WeatherMaster
 
         private async void BtnGo_Click(object sender, EventArgs e)
         {
+            //Validate empty string
             if (string.IsNullOrWhiteSpace(txtSearch.Text))
             {
                 MessageBox.Show("Please enter a city to search");
                 return;
             }
 
+            //Query for cities based on text
             var client = new RestClient("https://api.openweathermap.org");
             var geoRequest = new RestRequest("geo/1.0/direct", Method.Get);
             geoRequest.AddQueryParameter("q", txtSearch.Text.Trim());
             geoRequest.AddQueryParameter("limit", 5);
             geoRequest.AddQueryParameter("appid", _settings.ApiKey);
 
+            //Validate city results
             var geoResults = await client.ExecuteAsync<IEnumerable<GeoResult>>(geoRequest);
 
             if (geoResults.Data == null || !geoResults.Data.Any())
@@ -68,7 +74,7 @@ namespace WeatherMaster
             }
 
             GeoResult selectedCity;
-
+            //Display selection form if more than 1 city was returned
             if (geoResults.Data.Count() > 1)
             {
                 var selectionForm = new SelectionForm(geoResults.Data);
@@ -80,6 +86,7 @@ namespace WeatherMaster
                 selectedCity = geoResults.Data.First();
             }
 
+            //Request weather for selected city
             var weatherRequest = new RestRequest("data/2.5/weather", Method.Get);
             weatherRequest.AddQueryParameter("lat", selectedCity.Latitude);
             weatherRequest.AddQueryParameter("lon", selectedCity.Longitude);
@@ -88,28 +95,32 @@ namespace WeatherMaster
 
             var weatherResults = await client.ExecuteAsync<WeatherResult>(weatherRequest);
 
+            //Validate weather results
             if (weatherResults.Data == null)
             {
                 MessageBox.Show($"Could not get weather for {txtSearch.Text.Trim()}");
                 return;
             }
 
+            //Only write to history successful requests
             using StreamWriter file = new("history.txt", append: true);
             await file.WriteLineAsync(txtSearch.Text.Trim());
 
+            //Add to history listbox
             lstHistory.Items.Insert(0,txtSearch.Text.Trim());
             grbHistory.Visible = true;
 
+            //Display results
             lblLocation.Text = txtSearch.Text.Trim();
             lblTemperature.Text = weatherResults.Data.Main.Temperature.ToString("N0");
             lblCurrentWeather.Text = weatherResults.Data.Weather.First().Description.ToUpper();
             lblFeelsLike.Text = weatherResults.Data.Main.FeelsLike.ToString("N0");
-
             grbResults.Visible = true;
         }
 
         private void lstHistory_Click(object sender, EventArgs e)
         {
+            //When clicked copy value from history to textbox
             if (lstHistory.SelectedItem != null)
             {
                 txtSearch.Text = lstHistory.SelectedItem.ToString();
