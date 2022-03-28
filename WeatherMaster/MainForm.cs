@@ -23,9 +23,10 @@ namespace WeatherMaster
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
             //Initialise settings
             _settings = Program.Configuration.GetSection("AppSettings").Get<AppSettings>();
+            
+            base.OnLoad(e);
             _client = new RestClient(_settings.WeatherApi);
         }
 
