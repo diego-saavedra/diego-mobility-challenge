@@ -101,11 +101,19 @@ namespace WeatherMaster
             grbHistory.Visible = true;
 
             lblLocation.Text = txtSearch.Text.Trim();
-            lblTemperature.Text = weatherResults.Data.Main.Temperature.ToString();
-            lblCurrentWeather.Text = weatherResults.Data.Weather.First().Description;
-            lblFeelsLike.Text = weatherResults.Data.Main.FeelsLike.ToString();
+            lblTemperature.Text = weatherResults.Data.Main.Temperature.ToString("N0");
+            lblCurrentWeather.Text = weatherResults.Data.Weather.First().Description.ToUpper();
+            lblFeelsLike.Text = weatherResults.Data.Main.FeelsLike.ToString("N0");
 
             grbResults.Visible = true;
+        }
+
+        private void lstHistory_Click(object sender, EventArgs e)
+        {
+            if (lstHistory.SelectedItem != null)
+            {
+                txtSearch.Text = lstHistory.SelectedItem.ToString();
+            }
         }
     }
 }

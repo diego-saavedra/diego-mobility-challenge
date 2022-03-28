@@ -20,6 +20,6 @@ namespace WeatherMaster.Models
         public string State { get; set; }
 
         [JsonIgnore]
-        public string Display => $"{Name}, {Country}";
+        public string Display => $"{Name}, {State}, {Country}";
     }
 }

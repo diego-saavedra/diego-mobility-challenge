@@ -32,14 +32,14 @@
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnGo = new System.Windows.Forms.Button();
             this.grbResults = new System.Windows.Forms.GroupBox();
+            this.lblFeelsLike = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lblTemperature = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblCurrentWeather = new System.Windows.Forms.Label();
+            this.lblLocation = new System.Windows.Forms.Label();
             this.grbHistory = new System.Windows.Forms.GroupBox();
             this.lstHistory = new System.Windows.Forms.ListBox();
-            this.lblLocation = new System.Windows.Forms.Label();
-            this.lblCurrentWeather = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.lblTemperature = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lblFeelsLike = new System.Windows.Forms.Label();
             this.grbResults.SuspendLayout();
             this.grbHistory.SuspendLayout();
             this.SuspendLayout();
@@ -92,6 +92,60 @@
             this.grbResults.Text = "Result";
             this.grbResults.Visible = false;
             // 
+            // lblFeelsLike
+            // 
+            this.lblFeelsLike.AutoSize = true;
+            this.lblFeelsLike.Location = new System.Drawing.Point(72, 113);
+            this.lblFeelsLike.Name = "lblFeelsLike";
+            this.lblFeelsLike.Size = new System.Drawing.Size(13, 15);
+            this.lblFeelsLike.TabIndex = 6;
+            this.lblFeelsLike.Text = "0";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 113);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(60, 15);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "Feels Like:";
+            // 
+            // lblTemperature
+            // 
+            this.lblTemperature.AutoSize = true;
+            this.lblTemperature.Location = new System.Drawing.Point(131, 84);
+            this.lblTemperature.Name = "lblTemperature";
+            this.lblTemperature.Size = new System.Drawing.Size(13, 15);
+            this.lblTemperature.TabIndex = 3;
+            this.lblTemperature.Text = "0";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 84);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(119, 15);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Current Temperature:";
+            // 
+            // lblCurrentWeather
+            // 
+            this.lblCurrentWeather.AutoSize = true;
+            this.lblCurrentWeather.Location = new System.Drawing.Point(6, 52);
+            this.lblCurrentWeather.Name = "lblCurrentWeather";
+            this.lblCurrentWeather.Size = new System.Drawing.Size(51, 15);
+            this.lblCurrentWeather.TabIndex = 1;
+            this.lblCurrentWeather.Text = "Weather";
+            // 
+            // lblLocation
+            // 
+            this.lblLocation.AutoSize = true;
+            this.lblLocation.Location = new System.Drawing.Point(6, 22);
+            this.lblLocation.Name = "lblLocation";
+            this.lblLocation.Size = new System.Drawing.Size(53, 15);
+            this.lblLocation.TabIndex = 0;
+            this.lblLocation.Text = "Location";
+            // 
             // grbHistory
             // 
             this.grbHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -115,60 +169,7 @@
             this.lstHistory.Name = "lstHistory";
             this.lstHistory.Size = new System.Drawing.Size(174, 304);
             this.lstHistory.TabIndex = 0;
-            // 
-            // lblLocation
-            // 
-            this.lblLocation.AutoSize = true;
-            this.lblLocation.Location = new System.Drawing.Point(6, 22);
-            this.lblLocation.Name = "lblLocation";
-            this.lblLocation.Size = new System.Drawing.Size(53, 15);
-            this.lblLocation.TabIndex = 0;
-            this.lblLocation.Text = "Location";
-            // 
-            // lblCurrentWeather
-            // 
-            this.lblCurrentWeather.AutoSize = true;
-            this.lblCurrentWeather.Location = new System.Drawing.Point(6, 52);
-            this.lblCurrentWeather.Name = "lblCurrentWeather";
-            this.lblCurrentWeather.Size = new System.Drawing.Size(51, 15);
-            this.lblCurrentWeather.TabIndex = 1;
-            this.lblCurrentWeather.Text = "Weather";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 84);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(119, 15);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Current Temperature:";
-            // 
-            // lblTemperature
-            // 
-            this.lblTemperature.AutoSize = true;
-            this.lblTemperature.Location = new System.Drawing.Point(131, 84);
-            this.lblTemperature.Name = "lblTemperature";
-            this.lblTemperature.Size = new System.Drawing.Size(13, 15);
-            this.lblTemperature.TabIndex = 3;
-            this.lblTemperature.Text = "0";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 113);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(60, 15);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "Feels Like:";
-            // 
-            // lblFeelsLike
-            // 
-            this.lblFeelsLike.AutoSize = true;
-            this.lblFeelsLike.Location = new System.Drawing.Point(72, 113);
-            this.lblFeelsLike.Name = "lblFeelsLike";
-            this.lblFeelsLike.Size = new System.Drawing.Size(13, 15);
-            this.lblFeelsLike.TabIndex = 6;
-            this.lblFeelsLike.Text = "0";
+            this.lstHistory.Click += new System.EventHandler(this.lstHistory_Click);
             // 
             // MainForm
             // 
