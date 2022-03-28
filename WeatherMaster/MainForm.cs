@@ -58,7 +58,6 @@ namespace WeatherMaster
             request.AddQueryParameter("limit", 5);
             request.AddQueryParameter("appid", _settings.ApiKey);
 
-            //Validate city results
             var result = await _client.ExecuteAsync<IEnumerable<GeoResult>>(request);
 
             return result.Data;
